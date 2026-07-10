@@ -1,0 +1,30 @@
+---
+# Fails the build if any role deviates from ansible_role_template
+# (missing scaffolding, leftover tasks/upstream/, wrong var prefixes, ...).
+name: Role Compliance
+
+'on':
+  push:
+    paths:
+      - "roles/**"
+      - "check_roles.sh"
+  pull_request:
+    paths:
+      - "roles/**"
+      - "check_roles.sh"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  role-compliance:
+    name: Check roles comply with the role template
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the collection.
+        uses: actions/checkout@v4
+
+      - name: Run role compliance checker.
+        run: bash check_roles.sh
+...
