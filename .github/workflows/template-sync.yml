@@ -29,6 +29,11 @@ jobs:
     steps:
       - name: Check out the collection.
         uses: actions/checkout@v4
+        with:
+          # PAT with 'workflow' scope so synced .github/workflows/ changes can be
+          # pushed. Falls back to the built-in token when the secret is unset
+          # (in which case workflow files stay excluded via .templatesyncignore).
+          token: ${{ secrets.TEMPLATE_SYNC_TOKEN || github.token }}
 
       - name: Copy shared files from the template.
         env:
