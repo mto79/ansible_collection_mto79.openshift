@@ -1,0 +1,63 @@
+---
+# Keeps this collection's shared scaffolding in sync with the collection
+# template (mto79/ansible_collection_mto79.template).
+#
+# Everything in the template is copied over EXCEPT the paths listed in
+# .templatesyncignore (this collection's own galaxy.yml, README, roles, etc.).
+# Runs weekly and on demand. Uses the built-in GITHUB_TOKEN — no PAT needed.
+name: Template Sync
+
+'on':
+  schedule:
+    - cron: "0 6 * * 1"   # Mondays 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Preview changes without committing"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+
+jobs:
+  template-sync:
+    name: Sync from collection template
+    # Never run in the template repository itself.
+    if: ${{ !endsWith(github.repository, '.template') }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the collection.
+        uses: actions/checkout@v4
+
+      - name: Copy shared files from the template.
+        env:
+          TEMPLATE_REPO: "https://github.com/mto79/ansible_collection_mto79.template.git"
+        run: |
+          set -euo pipefail
+          git clone --depth 1 "${TEMPLATE_REPO}" /tmp/template
+          rm -rf /tmp/template/.git
+          # Build the rsync exclude list (drop comments and blank lines).
+          grep -vE '^[[:space:]]*(#|$)' .templatesyncignore > /tmp/excludes || true
+          rsync -a --exclude-from=/tmp/excludes /tmp/template/ ./
+          rm -rf /tmp/template /tmp/excludes
+
+      - name: Commit and push if changed.
+        run: |
+          set -euo pipefail
+          if [[ -z "$(git status --porcelain)" ]]; then
+            echo "Already in sync with the template."
+            exit 0
+          fi
+          echo "Changes to sync:"
+          git --no-pager diff --stat
+          if [[ "${{ github.event.inputs.dry_run }}" == "true" ]]; then
+            echo "Dry run requested — not committing."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "chore: sync shared files from collection template"
+          git push
+...

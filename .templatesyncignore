@@ -1,0 +1,17 @@
+# Files owned by each individual collection — the template sync never touches
+# these. Everything NOT listed here is kept in sync with the template repo.
+# Patterns are rsync-style, anchored to the repository root.
+/galaxy.yml
+/README.md
+/LICENSE
+/CHANGELOG.rst
+/replace.sh
+/requirements.yml
+/requirements.txt
+/meta/
+/docs/
+/plugins/
+/roles/
+/changelogs/changelog.yaml
+/changelogs/config.yaml
+/changelogs/.plugin-cache.yaml
