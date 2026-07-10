@@ -1,0 +1,15 @@
+.vagrant
+.*.swp
+.*.swo
+*~
+.vagrant/
+build/
+tests/output
+.molecule
+*.log
+*.swp
+.tox
+.cache
+.DS_Store
+*.tar.gz
+*.tar
