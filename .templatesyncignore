@@ -2,11 +2,6 @@
 # these. Everything NOT listed here is kept in sync with the template repo.
 # Patterns are rsync-style, anchored to the repository root.
 
-# GitHub's built-in GITHUB_TOKEN cannot push changes under .github/workflows/
-# without a PAT that has 'workflow' scope, so workflow files are not synced.
-# Update them via "Use this template" for new collections, or by hand.
-/.github/workflows/
-
 /galaxy.yml
 /README.md
 /LICENSE
